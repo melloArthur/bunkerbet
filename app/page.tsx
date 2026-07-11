@@ -27,8 +27,48 @@ type SavedTicket = {
 };
 
 const DEFAULT_GAMES: Game[] = [
-  { id: "real-constantino", home: "Real Madrid", away: "Imperial Constantino", homeShort: "RM", awayShort: "IC", odds: { home: 1.72, away: 4.2, bttsYes: 1.84, bttsNo: 1.95, exactScores: { "3x0": 6.5, "3x1": 5.2, "3x2": 7.4, "0x3": 12, "1x3": 9.5, "2x3": 11 } } },
-  { id: "girondino-azul", home: "C.A. Girondino", away: "Monte Azul", homeShort: "CAG", awayShort: "MA", odds: { home: 2.1, away: 2.95, bttsYes: 1.76, bttsNo: 2.05, exactScores: { "3x0": 7.2, "3x1": 5.8, "3x2": 6.8, "0x3": 8.5, "1x3": 6.6, "2x3": 7.5 } } },
+  {
+    "id": "real-constantino",
+    "home": "Real Madrid",
+    "away": "Imperial Constantino",
+    "homeShort": "RM",
+    "awayShort": "ICS",
+    "odds": {
+      "home": 1.72,
+      "away": 4.2,
+      "bttsYes": 1.84,
+      "bttsNo": 1.95,
+      "exactScores": {
+        "3x0": 6.5,
+        "3x1": 5.2,
+        "3x2": 7.4,
+        "0x3": 12,
+        "1x3": 9.5,
+        "2x3": 11
+      }
+    }
+  },
+  {
+    "id": "girondino-azul",
+    "home": "C.A. Girondino",
+    "away": "FK Sarajevo",
+    "homeShort": "CAG",
+    "awayShort": "SRJ",
+    "odds": {
+      "home": 2.1,
+      "away": 2.95,
+      "bttsYes": 1.76,
+      "bttsNo": 2.05,
+      "exactScores": {
+        "3x0": 7.2,
+        "3x1": 5.8,
+        "3x2": 6.8,
+        "0x3": 8.5,
+        "1x3": 6.6,
+        "2x3": 7.5
+      }
+    }
+  }
 ];
 
 const SCORE_OPTIONS = ["3x0", "3x1", "3x2", "0x3", "1x3", "2x3"];
