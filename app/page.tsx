@@ -28,44 +28,86 @@ type SavedTicket = {
 
 const DEFAULT_GAMES: Game[] = [
   {
-    "id": "real-constantino",
-    "home": "Real Madrid",
-    "away": "Imperial Constantino",
-    "homeShort": "RM",
-    "awayShort": "ICS",
+    "id": "fiorentina-wartburg",
+    "home": "ACF Fiorentina",
+    "away": "ASK Wartburg",
+    "homeShort": "FIO",
+    "awayShort": "WTB",
     "odds": {
-      "home": 1.72,
-      "away": 4.2,
-      "bttsYes": 1.84,
-      "bttsNo": 1.95,
+      "home": 1.45,
+      "away": 2.77,
+      "bttsYes": 1.31,
+      "bttsNo": 3.51,
       "exactScores": {
-        "3x0": 6.5,
-        "3x1": 5.2,
-        "3x2": 7.4,
-        "0x3": 12,
-        "1x3": 9.5,
-        "2x3": 11
+        "3x0": 4.76,
+        "3x1": 3.82,
+        "3x2": 4.6,
+        "0x3": 13.3,
+        "1x3": 7.58,
+        "2x3": 6.48
       }
     }
   },
   {
-    "id": "girondino-azul",
-    "home": "C.A. Girondino",
-    "away": "FK Sarajevo",
-    "homeShort": "CAG",
-    "awayShort": "SRJ",
+    "id": "sarajevo-girondino",
+    "home": "FK Sarajevo",
+    "away": "C.A. Girondino",
+    "homeShort": "SRJ",
+    "awayShort": "CAG",
     "odds": {
-      "home": 2.1,
-      "away": 2.95,
-      "bttsYes": 1.76,
-      "bttsNo": 2.05,
+      "home": 1.63,
+      "away": 2.28,
+      "bttsYes": 1.28,
+      "bttsNo": 3.72,
       "exactScores": {
-        "3x0": 7.2,
-        "3x1": 5.8,
-        "3x2": 6.8,
-        "0x3": 8.5,
-        "1x3": 6.6,
-        "2x3": 7.5
+        "3x0": 5.9,
+        "3x1": 4.32,
+        "3x2": 4.74,
+        "0x3": 10.07,
+        "1x3": 6.16,
+        "2x3": 5.66
+      }
+    }
+  },
+  {
+    "id": "securitate-milan",
+    "home": "CF Securitate",
+    "away": "AC Milan",
+    "homeShort": "SEC",
+    "awayShort": "MIL",
+    "odds": {
+      "home": 1.81,
+      "away": 2.01,
+      "bttsYes": 1.27,
+      "bttsNo": 3.8,
+      "exactScores": {
+        "3x0": 6.99,
+        "3x1": 4.8,
+        "3x2": 4.94,
+        "0x3": 8.33,
+        "1x3": 5.39,
+        "2x3": 5.24
+      }
+    }
+  },
+  {
+    "id": "constantino-lazio",
+    "home": "Imperial Constantino",
+    "away": "SS Lazio",
+    "homeShort": "ICS",
+    "awayShort": "LAZ",
+    "odds": {
+      "home": 2.0,
+      "away": 1.82,
+      "bttsYes": 1.27,
+      "bttsNo": 3.8,
+      "exactScores": {
+        "3x0": 8.21,
+        "3x1": 5.34,
+        "3x2": 5.21,
+        "0x3": 7.08,
+        "1x3": 4.84,
+        "2x3": 4.96
       }
     }
   }
@@ -82,6 +124,7 @@ export default function Home() {
   const [games, setGames] = useState<Game[]>(DEFAULT_GAMES);
   const [selections, setSelections] = useState<Selection[]>([]);
   const [ticketMode, setTicketMode] = useState<TicketMode>("multiple");
+  const [selectionWarning, setSelectionWarning] = useState("");
   const [stake, setStake] = useState("100");
   const [singleStakes, setSingleStakes] = useState<Record<string, string>>({});
   const [scores, setScores] = useState<Record<string, string>>({});
@@ -115,17 +158,45 @@ export default function Home() {
   const returnValue = ticketMode === "multiple" ? stakeNumber * (selections.length ? totalOdd : 0) : singlesReturn;
   const ticketValid = selections.length > 0 && totalStake > 0 && (ticketMode === "multiple" || selections.every((item) => toNumber(singleStakes[item.id]) > 0));
 
+  function areDependent(left: Selection, right: Selection) {
+    if (left.gameId !== right.gameId) return false;
+    const leftExact = left.market === "Placar exato";
+    const rightExact = right.market === "Placar exato";
+    const leftDerived = left.market === "Vencedor" || left.market === "Ambas marcam";
+    const rightDerived = right.market === "Vencedor" || right.market === "Ambas marcam";
+    return (leftExact && rightDerived) || (rightExact && leftDerived);
+  }
+
   function toggleSelection(selection: Selection) {
     setCopiedId("");
+    if (isSelected(selection.id)) {
+      setSelections((current) => current.filter((item) => item.id !== selection.id));
+      setSelectionWarning("");
+      return;
+    }
+    if (ticketMode === "multiple" && selections.some((item) => areDependent(item, selection))) {
+      setSelectionWarning("O placar exato já determina o vencedor e se ambas marcam. Esses mercados não podem ser combinados na mesma múltipla.");
+      return;
+    }
+    setSelectionWarning("");
     setSelections((current) => {
-      const sameMarket = current.find((item) => item.gameId === selection.gameId && item.market === selection.market);
-      if (sameMarket?.id === selection.id) return current.filter((item) => item.id !== selection.id);
       return [...current.filter((item) => !(item.gameId === selection.gameId && item.market === selection.market)), selection];
     });
     setSingleStakes((current) => current[selection.id] ? current : { ...current, [selection.id]: "10" });
   }
 
   function isSelected(id: string) { return selections.some((item) => item.id === id); }
+
+  function selectMultipleMode() {
+    const hasDependencies = selections.some((item, index) => selections.slice(index + 1).some((other) => areDependent(item, other)));
+    if (hasDependencies) {
+      setSelectionWarning("Remova as combinações dependentes antes de transformar o ticket em múltipla.");
+      return;
+    }
+    setSelectionWarning("");
+    setTicketMode("multiple");
+    setCopiedId("");
+  }
 
   function selectScore(game: Game, score: string) {
     setScores((current) => ({ ...current, [game.id]: score }));
@@ -266,7 +337,8 @@ export default function Home() {
         <aside className="slip">
           <div className="slip-title"><span>★</span><h2>SEU BILHETE</h2><span>★</span></div>
           <div className="slip-paper">
-            <div className="mode-toggle"><button className={ticketMode === "singles" ? "active" : ""} onClick={() => { setTicketMode("singles"); setCopiedId(""); }}>SEPARADAS</button><button className={ticketMode === "multiple" ? "active" : ""} onClick={() => { setTicketMode("multiple"); setCopiedId(""); }}>MÚLTIPLA</button></div>
+            <div className="mode-toggle"><button className={ticketMode === "singles" ? "active" : ""} onClick={() => { setTicketMode("singles"); setSelectionWarning(""); setCopiedId(""); }}>SEPARADAS</button><button className={ticketMode === "multiple" ? "active" : ""} onClick={selectMultipleMode}>MÚLTIPLA</button></div>
+            {selectionWarning && <div className="selection-warning" role="alert">ⓘ {selectionWarning}</div>}
             <div className="slip-type">{selections.length ? `${ticketMode === "multiple" ? "MÚLTIPLA" : "SEPARADAS"} · ${selections.length} SELEÇÕES` : "BILHETE VAZIO"}</div>
             <div className="selections">
               {!selections.length && <div className="empty-slip"><strong>Escolha seu primeiro palpite</strong><span>As seleções aparecerão aqui.</span></div>}
