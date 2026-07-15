@@ -311,7 +311,7 @@ export default function Home() {
     <main>
       <header className="topbar">
         <div className="brand-wrap"><div className="crest" aria-hidden="true"><span>BB</span><small>RP</small></div><div className="brand">BUNKER BET</div><div className="official">CASA DE APOSTAS OFICIAL</div></div>
-        <div className="header-actions"><button className="admin-link" onClick={openAdmin}>PAINEL DO ADM</button><div className="round-status"><i /> RODADA 12 ABERTA</div></div>
+        <div className="header-actions"><button className="admin-link" onClick={openAdmin}>PAINEL DO ADM</button><div className="round-status"><i /> RODADA 4 ABERTA</div></div>
       </header>
 
       <div className="page-grid">
