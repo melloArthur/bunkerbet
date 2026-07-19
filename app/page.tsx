@@ -52,8 +52,8 @@ const DEFAULT_GAMES: Game[] = [
     "id": "steaua-real",
     "home": "Steaua Bucareste",
     "away": "Real Madrid",
-    "homeShort": "BUC",
-    "awayShort": "RMA",
+    "homeShort": "STB",
+    "awayShort": "RM",
     "odds": {
       "home": 1.97,
       "away": 1.85,
@@ -74,7 +74,7 @@ const DEFAULT_GAMES: Game[] = [
     "home": "AC Milan",
     "away": "SS Lazio",
     "homeShort": "ACM",
-    "awayShort": "LAZ",
+    "awayShort": "SSL",
     "odds": {
       "home": 1.49,
       "away": 2.63,
@@ -94,7 +94,7 @@ const DEFAULT_GAMES: Game[] = [
     "id": "fiorentina-constantino",
     "home": "ACF Fiorentina",
     "away": "Imperial Constantino",
-    "homeShort": "FIO",
+    "homeShort": "ACF",
     "awayShort": "ICS",
     "odds": {
       "home": 1.44,
