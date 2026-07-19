@@ -28,86 +28,86 @@ type SavedTicket = {
 
 const DEFAULT_GAMES: Game[] = [
   {
-    "id": "fiorentina-wartburg",
-    "home": "ACF Fiorentina",
-    "away": "ASK Wartburg",
-    "homeShort": "FIO",
-    "awayShort": "WTB",
-    "odds": {
-      "home": 1.45,
-      "away": 2.77,
-      "bttsYes": 1.31,
-      "bttsNo": 3.51,
-      "exactScores": {
-        "3x0": 4.76,
-        "3x1": 3.82,
-        "3x2": 4.6,
-        "0x3": 13.3,
-        "1x3": 7.58,
-        "2x3": 6.48
-      }
-    }
-  },
-  {
     "id": "sarajevo-girondino",
     "home": "FK Sarajevo",
-    "away": "C.A. Girondino",
+    "away": "CA Girondino",
     "homeShort": "SRJ",
     "awayShort": "CAG",
     "odds": {
-      "home": 1.63,
-      "away": 2.28,
-      "bttsYes": 1.28,
-      "bttsNo": 3.72,
+      "home": 1.51,
+      "away": 2.57,
+      "bttsYes": 1.3,
+      "bttsNo": 3.6,
       "exactScores": {
-        "3x0": 5.9,
-        "3x1": 4.32,
-        "3x2": 4.74,
-        "0x3": 10.07,
-        "1x3": 6.16,
-        "2x3": 5.66
+        "3x0": 5.14,
+        "3x1": 3.99,
+        "3x2": 4.64,
+        "0x3": 11.97,
+        "1x3": 7.0,
+        "2x3": 6.14
       }
     }
   },
   {
-    "id": "securitate-milan",
-    "home": "CF Securitate",
-    "away": "AC Milan",
-    "homeShort": "SEC",
-    "awayShort": "MIL",
+    "id": "steaua-real",
+    "home": "Steaua Bucareste",
+    "away": "Real Madrid",
+    "homeShort": "BUC",
+    "awayShort": "RMA",
     "odds": {
-      "home": 1.81,
-      "away": 2.01,
+      "home": 1.97,
+      "away": 1.85,
       "bttsYes": 1.27,
-      "bttsNo": 3.8,
+      "bttsNo": 3.81,
       "exactScores": {
-        "3x0": 6.99,
-        "3x1": 4.8,
-        "3x2": 4.94,
-        "0x3": 8.33,
-        "1x3": 5.39,
-        "2x3": 5.24
+        "3x0": 8.02,
+        "3x1": 5.26,
+        "3x2": 5.17,
+        "0x3": 7.25,
+        "1x3": 4.91,
+        "2x3": 5.0
       }
     }
   },
   {
-    "id": "constantino-lazio",
-    "home": "Imperial Constantino",
+    "id": "milan-lazio",
+    "home": "AC Milan",
     "away": "SS Lazio",
-    "homeShort": "ICS",
+    "homeShort": "ACM",
     "awayShort": "LAZ",
     "odds": {
-      "home": 2.0,
-      "away": 1.82,
-      "bttsYes": 1.27,
-      "bttsNo": 3.8,
+      "home": 1.49,
+      "away": 2.63,
+      "bttsYes": 1.3,
+      "bttsNo": 3.57,
       "exactScores": {
-        "3x0": 8.21,
-        "3x1": 5.34,
-        "3x2": 5.21,
-        "0x3": 7.08,
-        "1x3": 4.84,
-        "2x3": 4.96
+        "3x0": 5.03,
+        "3x1": 3.94,
+        "3x2": 4.62,
+        "0x3": 12.35,
+        "1x3": 7.17,
+        "2x3": 6.24
+      }
+    }
+  },
+  {
+    "id": "fiorentina-constantino",
+    "home": "ACF Fiorentina",
+    "away": "Imperial Constantino",
+    "homeShort": "FIO",
+    "awayShort": "ICS",
+    "odds": {
+      "home": 1.44,
+      "away": 2.8,
+      "bttsYes": 1.31,
+      "bttsNo": 3.49,
+      "exactScores": {
+        "3x0": 4.71,
+        "3x1": 3.8,
+        "3x2": 4.6,
+        "0x3": 13.51,
+        "1x3": 7.67,
+        "2x3": 6.54
       }
     }
   }
