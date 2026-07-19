@@ -11,8 +11,12 @@ type Game = {
   odds: { home: number; away: number; bttsYes: number; bttsNo: number; exactScores: Record<string, number> };
 };
 
-type Selection = { id: string; gameId: string; game: string; market: string; pick: string; odd: number };
+type Selection = { id: string; gameId: string; game: string; market: string; pick: string; odd: number; sport?: Sport; marketCode?: string; subject?: string };
 type TicketMode = "multiple" | "singles";
+type Sport = "football" | "f1";
+type F1Option = { id: string; label: string; odd: number; group?: string };
+type F1Market = { id: string; section: string; title: string; options: F1Option[] };
+type F1Config = { eventName: string; markets: F1Market[] };
 type SavedTicket = {
   id: string;
   mode: TicketMode;
@@ -115,13 +119,461 @@ const DEFAULT_GAMES: Game[] = [
 
 const SCORE_OPTIONS = ["3x0", "3x1", "3x2", "0x3", "1x3", "2x3"];
 const ADMIN_PASSWORD = "bunker123";
+const F1_SECTIONS = ["PILOTOS", "EQUIPES", "TEMPORADA"];
+const F1_DRIVERS = [
+  {
+    id: "ireland",
+    name: "I. Ireland (REN)",
+    teamId: "renault",
+    odds: {
+      winner: 5.40,
+      podiumYes: 1.85,
+      podiumNo: 1.64,
+      pole: 9.07,
+    },
+  },
+  {
+    id: "mclaren",
+    name: "B. McLaren (POR)",
+    teamId: "porsche",
+    odds: {
+      winner: 8.96,
+      podiumYes: 2.51,
+      podiumNo: 1.33,
+      pole: 13.64,
+    },
+  },
+  {
+    id: "bonnier",
+    name: "J. Bonnier (LOT)",
+    teamId: "lotus",
+    odds: {
+      winner: 9.29,
+      podiumYes: 2.56,
+      podiumNo: 1.32,
+      pole: 10.34,
+    },
+  },
+  {
+    id: "moss",
+    name: "S. Moss (LOT)",
+    teamId: "lotus",
+    odds: {
+      winner: 9.78,
+      podiumYes: 2.64,
+      podiumNo: 1.30,
+      pole: 9.73,
+    },
+  },
+  {
+    id: "brabham",
+    name: "J. Brabham (COO)",
+    teamId: "cooper",
+    odds: {
+      winner: 10.83,
+      podiumYes: 2.79,
+      podiumNo: 1.26,
+      pole: 6.15,
+    },
+  },
+  {
+    id: "ginther",
+    name: "R. Ginther (FER)",
+    teamId: "ferrari",
+    odds: {
+      winner: 12.10,
+      podiumYes: 2.96,
+      podiumNo: 1.23,
+      pole: 6.24,
+    },
+  },
+  {
+    id: "gendebien",
+    name: "O. Gendebien (REN)",
+    teamId: "renault",
+    odds: {
+      winner: 12.97,
+      podiumYes: 3.07,
+      podiumNo: 1.21,
+      pole: 10.73,
+    },
+  },
+  {
+    id: "clark",
+    name: "J. Clark (POR)",
+    teamId: "porsche",
+    odds: {
+      winner: 13.97,
+      podiumYes: 3.18,
+      podiumNo: 1.20,
+      pole: 16.79,
+    },
+  },
+  {
+    id: "allison",
+    name: "C. Allison (COO)",
+    teamId: "cooper",
+    odds: {
+      winner: 20.65,
+      podiumYes: 3.79,
+      podiumNo: 1.13,
+      pole: 20.87,
+    },
+  },
+  {
+    id: "mairesse",
+    name: "W. Mairesse (FER)",
+    teamId: "ferrari",
+    odds: {
+      winner: 21.41,
+      podiumYes: 3.85,
+      podiumNo: 1.12,
+      pole: 22.19,
+    },
+  },
+  {
+    id: "gonzalez",
+    name: "J. F. González (MAT)",
+    teamId: "matra",
+    odds: {
+      winner: 22.67,
+      podiumYes: 3.92,
+      podiumNo: 1.12,
+      pole: 21.50,
+    },
+  },
+  {
+    id: "phil-hill",
+    name: "P. Hill (LAM)",
+    teamId: "lamborghini",
+    odds: {
+      winner: 25.21,
+      podiumYes: 4.07,
+      podiumNo: 1.11,
+      pole: 27.30,
+    },
+  },
+  {
+    id: "surtees",
+    name: "J. Surtees (LAM)",
+    teamId: "lamborghini",
+    odds: {
+      winner: 26.56,
+      podiumYes: 4.14,
+      podiumNo: 1.10,
+      pole: 30.80,
+    },
+  },
+  {
+    id: "von-trips",
+    name: "W. von Trips (ALF)",
+    teamId: "alfa-romeo",
+    odds: {
+      winner: 26.96,
+      podiumYes: 4.15,
+      podiumNo: 1.10,
+      pole: 29.88,
+    },
+  },
+  {
+    id: "trintignant",
+    name: "M. Trintignant (MAT)",
+    teamId: "matra",
+    odds: {
+      winner: 29.76,
+      podiumYes: 4.30,
+      podiumNo: 1.09,
+      pole: 40.42,
+    },
+  },
+  {
+    id: "graham-hill",
+    name: "G. Hill (ALF)",
+    teamId: "alfa-romeo",
+    odds: {
+      winner: 30.96,
+      podiumYes: 4.33,
+      podiumNo: 1.09,
+      pole: 40.70,
+    },
+  },
+];
 
+const F1_TEAMS = [
+  {
+    id: "renault",
+    name: "Renault (GEN+IRE)",
+    odds: {
+      mostPoints: 3.75,
+      bothScoreYes: 2.44,
+      bothScoreNo: 1.35,
+    },
+  },
+  {
+    id: "porsche",
+    name: "Porsche (CLA+MCL)",
+    odds: {
+      mostPoints: 5.44,
+      bothScoreYes: 3.09,
+      bothScoreNo: 1.21,
+    },
+  },
+  {
+    id: "lotus",
+    name: "Lotus (BON+MOS)",
+    odds: {
+      mostPoints: 4.68,
+      bothScoreYes: 2.64,
+      bothScoreNo: 1.30,
+    },
+  },
+  {
+    id: "cooper",
+    name: "Cooper (BRA+ALL)",
+    odds: {
+      mostPoints: 7.20,
+      bothScoreYes: 3.89,
+      bothScoreNo: 1.12,
+    },
+  },
+  {
+    id: "ferrari",
+    name: "Ferrari (GIN+MAI)",
+    odds: {
+      mostPoints: 7.85,
+      bothScoreYes: 4.06,
+      bothScoreNo: 1.11,
+    },
+  },
+  {
+    id: "lamborghini",
+    name: "Lamborghini (HIL+SUR)",
+    odds: {
+      mostPoints: 13.22,
+      bothScoreYes: 4.99,
+      bothScoreNo: 1.05,
+    },
+  },
+  {
+    id: "matra",
+    name: "Matra (GON+TRI)",
+    odds: {
+      mostPoints: 13.13,
+      bothScoreYes: 4.99,
+      bothScoreNo: 1.05,
+    },
+  },
+  {
+    id: "alfa-romeo",
+    name: "Alfa Romeo (VTR+GHI)",
+    odds: {
+      mostPoints: 14.72,
+      bothScoreYes: 5.12,
+      bothScoreNo: 1.05,
+    },
+  },
+];
+
+const F1_HEAD_TO_HEAD = [
+  {
+    id: "brabham-allison",
+    driver1: "brabham",
+    driver1Odd: 1.39,
+    driver2: "allison",
+    driver2Odd: 2.32,
+  },
+  {
+    id: "moss-bonnier",
+    driver1: "moss",
+    driver1Odd: 1.78,
+    driver2: "bonnier",
+    driver2Odd: 1.70,
+  },
+  {
+    id: "ginther-mairesse",
+    driver1: "ginther",
+    driver1Odd: 1.42,
+    driver2: "mairesse",
+    driver2Odd: 2.23,
+  },
+  {
+    id: "gonzalez-trintignant",
+    driver1: "gonzalez",
+    driver1Odd: 1.56,
+    driver2: "trintignant",
+    driver2Odd: 1.96,
+  },
+  {
+    id: "gendebien-ireland",
+    driver1: "gendebien",
+    driver1Odd: 2.57,
+    driver2: "ireland",
+    driver2Odd: 1.31,
+  },
+  {
+    id: "surtees-phil-hill",
+    driver1: "surtees",
+    driver1Odd: 1.78,
+    driver2: "phil-hill",
+    driver2Odd: 1.70,
+  },
+  {
+    id: "clark-mclaren",
+    driver1: "clark",
+    driver1Odd: 2.11,
+    driver2: "mclaren",
+    driver2Odd: 1.48,
+  },
+  {
+    id: "von-trips-graham-hill",
+    driver1: "von-trips",
+    driver1Odd: 1.65,
+    driver2: "graham-hill",
+    driver2Odd: 1.84,
+  },
+];
+
+const getF1Driver = (id: string) => {
+  const driver = F1_DRIVERS.find((item) => item.id === id);
+
+  if (!driver) {
+    throw new Error(`Piloto de F1 não encontrado: ${id}`);
+  }
+
+  return driver;
+};
+
+const DEFAULT_F1: F1Config = {
+  eventName: "PRÓXIMO GRANDE PRÊMIO",
+
+  markets: [
+    {
+      id: "race-winner",
+      section: "PILOTOS",
+      title: "Vencedor",
+      options: F1_DRIVERS.map((driver) => ({
+        id: driver.id,
+        label: driver.name,
+        odd: driver.odds.winner,
+      })),
+    },
+
+    {
+      id: "podium",
+      section: "PILOTOS",
+      title: "Pódio: sim/não",
+      options: F1_DRIVERS.flatMap((driver) => [
+        {
+          id: `${driver.id}-yes`,
+          group: driver.id,
+          label: `${driver.name} — Sim`,
+          odd: driver.odds.podiumYes,
+        },
+        {
+          id: `${driver.id}-no`,
+          group: driver.id,
+          label: `${driver.name} — Não`,
+          odd: driver.odds.podiumNo,
+        },
+      ]),
+    },
+
+    {
+      id: "h2h",
+      section: "PILOTOS",
+      title: "Head-to-head",
+      options: F1_HEAD_TO_HEAD.flatMap((duel) => {
+        const driver1 = getF1Driver(duel.driver1);
+        const driver2 = getF1Driver(duel.driver2);
+
+        return [
+          {
+            id: `${duel.id}-${driver1.id}`,
+            group: duel.id,
+            label: driver1.name,
+            odd: duel.driver1Odd,
+          },
+          {
+            id: `${duel.id}-${driver2.id}`,
+            group: duel.id,
+            label: driver2.name,
+            odd: duel.driver2Odd,
+          },
+        ];
+      }),
+    },
+
+    {
+      id: "pole",
+      section: "PILOTOS",
+      title: "Pole position",
+      options: F1_DRIVERS.map((driver) => ({
+        id: driver.id,
+        label: driver.name,
+        odd: driver.odds.pole,
+      })),
+    },
+
+    {
+      id: "team-points",
+      section: "EQUIPES",
+      title: "Equipe marca mais pontos",
+      options: F1_TEAMS.map((team) => ({
+        id: team.id,
+        label: team.name,
+        odd: team.odds.mostPoints,
+      })),
+    },
+
+    {
+      id: "both-score",
+      section: "EQUIPES",
+      title: "Ambos pontuam: sim/não",
+      options: F1_TEAMS.flatMap((team) => [
+        {
+          id: `${team.id}-yes`,
+          group: team.id,
+          label: `${team.name} — Sim`,
+          odd: team.odds.bothScoreYes,
+        },
+        {
+          id: `${team.id}-no`,
+          group: team.id,
+          label: `${team.name} — Não`,
+          odd: team.odds.bothScoreNo,
+        },
+      ]),
+    },
+
+    /*
+     * Estes mercados dependem do número de GPs restantes.
+     * Reative-os depois que as odds de temporada forem calculadas.
+     *
+     * {
+     *   id: "driver-champion",
+     *   section: "TEMPORADA",
+     *   title: "Piloto campeão",
+     *   options: [],
+     * },
+     *
+     * {
+     *   id: "team-champion",
+     *   section: "TEMPORADA",
+     *   title: "Equipe campeã",
+     *   options: [],
+     * },
+     */
+  ],
+};
 const fmtOdd = (value: number) => value.toFixed(2);
 const money = (value: number) => new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 const toNumber = (value: string | undefined) => Number((value ?? "").replace(",", ".")) || 0;
 
 export default function Home() {
+  const [activeSport, setActiveSport] = useState<Sport>("football");
   const [games, setGames] = useState<Game[]>(DEFAULT_GAMES);
+  const [f1, setF1] = useState<F1Config>(DEFAULT_F1);
+  const [activeF1Market, setActiveF1Market] = useState("race-winner");
   const [selections, setSelections] = useState<Selection[]>([]);
   const [ticketMode, setTicketMode] = useState<TicketMode>("multiple");
   const [selectionWarning, setSelectionWarning] = useState("");
@@ -134,12 +586,13 @@ export default function Home() {
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [adminTab, setAdminTab] = useState<"round" | "tickets">("round");
+  const [adminTab, setAdminTab] = useState<"round" | "f1" | "tickets">("round");
   const [ticketSearch, setTicketSearch] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
 
   useEffect(() => {
     const savedGames = window.localStorage.getItem("bunker-bet-games");
+    const savedF1 = window.localStorage.getItem("bunker-bet-f1-v3");
     const savedHistory = window.localStorage.getItem("bunker-bet-tickets");
     // Dados locais só podem ser restaurados após a montagem no navegador.
     if (savedGames) try {
@@ -147,6 +600,7 @@ export default function Home() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setGames(parsed.map((game) => ({ ...game, odds: { ...game.odds, exactScores: game.odds.exactScores ?? Object.fromEntries(SCORE_OPTIONS.map((score) => [score, game.odds.exact ?? 6])) } })));
     } catch { /* mantém o padrão */ }
+    if (savedF1) try { setF1(JSON.parse(savedF1)); } catch { /* mantém o padrão */ }
     if (savedHistory) try { setSavedTickets(JSON.parse(savedHistory)); } catch { /* começa vazio */ }
   }, []);
 
@@ -159,6 +613,11 @@ export default function Home() {
   const ticketValid = selections.length > 0 && totalStake > 0 && (ticketMode === "multiple" || selections.every((item) => toNumber(singleStakes[item.id]) > 0));
 
   function areDependent(left: Selection, right: Selection) {
+    if (left.sport === "f1" && right.sport === "f1") {
+      const codes = new Set([left.marketCode, right.marketCode]);
+      const winnerDependency = codes.has("race-winner") && (codes.has("podium") || codes.has("h2h"));
+      return Boolean(winnerDependency && left.subject && left.subject === right.subject);
+    }
     if (left.gameId !== right.gameId) return false;
     const leftExact = left.market === "Placar exato";
     const rightExact = right.market === "Placar exato";
@@ -175,7 +634,7 @@ export default function Home() {
       return;
     }
     if (ticketMode === "multiple" && selections.some((item) => areDependent(item, selection))) {
-      setSelectionWarning("O placar exato já determina o vencedor e se ambas marcam. Esses mercados não podem ser combinados na mesma múltipla.");
+      setSelectionWarning("Uma das escolhas já determina ou contradiz o outro mercado. Elas não podem ser combinadas na mesma múltipla.");
       return;
     }
     setSelectionWarning("");
@@ -201,6 +660,21 @@ export default function Home() {
   function selectScore(game: Game, score: string) {
     setScores((current) => ({ ...current, [game.id]: score }));
     toggleSelection({ id: `${game.id}-score-${score}`, gameId: game.id, game: `${game.home} x ${game.away}`, market: "Placar exato", pick: score.replace("x", " x "), odd: game.odds.exactScores[score] });
+  }
+
+  function selectF1(market: F1Market, option: F1Option) {
+    const group = option.group ?? "principal";
+    toggleSelection({
+      id: `f1-${market.id}-${option.id}`,
+      gameId: `f1-${market.id}-${group}`,
+      game: market.section === "TEMPORADA" ? "Temporada" : f1.eventName,
+      market: market.title,
+      pick: option.label,
+      odd: option.odd,
+      sport: "f1",
+      marketCode: market.id,
+      subject: market.id === "podium" ? option.group : option.id,
+    });
   }
 
   function createId(mode: TicketMode, value: number, odd: number) {
@@ -284,6 +758,18 @@ export default function Home() {
     window.setTimeout(() => setAdminMessage(""), 2600);
   }
 
+  function saveF1() {
+    window.localStorage.setItem("bunker-bet-f1-v3", JSON.stringify(f1));
+    setAdminMessage("Mercados da Fórmula 1 salvos neste navegador.");
+    window.setTimeout(() => setAdminMessage(""), 2600);
+  }
+
+  function updateF1Option(marketId: string, optionId: string, field: "label" | "odd", value: string) {
+    setF1((current) => ({ ...current, markets: current.markets.map((market) => market.id !== marketId ? market : {
+      ...market, options: market.options.map((option) => option.id !== optionId ? option : { ...option, [field]: field === "odd" ? Number(value) || 0 : value }),
+    }) }));
+  }
+
   async function copyGamesJson() {
     await navigator.clipboard.writeText(JSON.stringify(games, null, 2));
     setAdminMessage("JSON copiado.");
@@ -306,16 +792,41 @@ export default function Home() {
 
   const filteredTickets = savedTickets.filter((ticket) => ticket.id.includes(ticketSearch.trim().toUpperCase()));
   const decodedTicket = ticketSearch ? decodeId(ticketSearch) : null;
+  const currentF1Market = f1.markets.find((market) => market.id === activeF1Market) ?? f1.markets[0];
+
+  function f1OptionButton(market: F1Market, option: F1Option, compactLabel?: string) {
+    const id = `f1-${market.id}-${option.id}`;
+    return <button key={option.id} className={isSelected(id) ? "f1-odd active" : "f1-odd"} onClick={() => selectF1(market, option)}><span>{compactLabel ?? option.label}</span><b>{fmtOdd(option.odd)}</b></button>;
+  }
+
+  function renderF1Options(market: F1Market) {
+    if (!market.options.some((option) => option.group)) return <div className="f1-options driver-grid">{market.options.map((option) => f1OptionButton(market, option))}</div>;
+    const groups = market.options.reduce<Record<string, F1Option[]>>((result, option) => {
+      const key = option.group ?? option.id;
+      result[key] = [...(result[key] ?? []), option];
+      return result;
+    }, {});
+    if (market.id === "h2h") return <div className="h2h-list">{Object.entries(groups).map(([group, options]) => <div className="h2h-row" key={group}>{f1OptionButton(market, options[0])}<strong>VS.</strong>{f1OptionButton(market, options[1])}</div>)}</div>;
+    return <div className="binary-list">{Object.entries(groups).map(([group, options]) => {
+      const subject = options[0].label.split(" — ")[0];
+      return <div className="binary-row" key={group}><strong>{subject}</strong><div>{options.map((option) => f1OptionButton(market, option, option.label.split(" — ")[1] ?? option.label))}</div></div>;
+    })}</div>;
+  }
 
   return (
     <main>
       <header className="topbar">
         <div className="brand-wrap"><div className="crest" aria-hidden="true"><span>BB</span><small>RP</small></div><div className="brand">BUNKER BET</div><div className="official">CASA DE APOSTAS OFICIAL</div></div>
-        <div className="header-actions"><button className="admin-link" onClick={openAdmin}>PAINEL DO ADM</button><div className="round-status"><i /> QUARTAS DE FINAL ABERTA</div></div>
+        <div className="header-actions"><button className="admin-link" onClick={openAdmin}>PAINEL DO ADM</button><div className="round-status"><i /> {activeSport === "football" ? "RODADA 12 ABERTA" : "GP ABERTO"}</div></div>
       </header>
 
+      <nav className="sport-tabs" aria-label="Modalidade">
+        <button className={activeSport === "football" ? "active" : ""} onClick={() => setActiveSport("football")}><span>⚽</span> FUTEBOL</button>
+        <button className={activeSport === "f1" ? "active" : ""} onClick={() => setActiveSport("f1")}><span>🏁</span> FÓRMULA 1</button>
+      </nav>
+
       <div className="page-grid">
-        <section className="content">
+        {activeSport === "football" ? <section className="content">
           <div className="hero"><div><p className="eyebrow">CAMPEONATO BUNKERIANO</p><h1>MONTE SEU BILHETE.<br />FAÇA HISTÓRIA.</h1><p className="hero-copy">Escolha seus palpites e gere o ticket para conferência no Discord.</p></div><div className="ticket-number"><span>TICKET Nº</span><strong>BB-512</strong><b>★ ★ ★</b></div></div>
           <div className="section-heading"><span className="ball-mark">◉</span><h2>JOGOS DA RODADA</h2><span className="count">{games.length} partidas</span></div>
           <div className="games">
@@ -332,7 +843,17 @@ export default function Home() {
               </article>;
             })}
           </div>
-        </section>
+        </section> : <section className="content f1-content">
+          <div className="hero f1-hero"><div><p className="eyebrow">BUNKER MOTORSPORT</p><h1>ACELERE SEUS<br />PALPITES.</h1><p className="hero-copy">Escolha pilotos, equipes e mercados da temporada para montar seu ticket.</p></div><div className="f1-flag" aria-hidden="true"><span>01</span><b>RACE</b></div></div>
+          <div className="f1-event"><span>PRÓXIMO EVENTO</span><strong>{f1.eventName}</strong></div>
+          <div className="f1-browser">
+            <div className="f1-market-nav">{F1_SECTIONS.map((section) => <div className="f1-nav-group" key={section}><strong>{section}</strong>{f1.markets.filter((market) => market.section === section).map((market) => <button key={market.id} className={activeF1Market === market.id ? "active" : ""} onClick={() => setActiveF1Market(market.id)}>{market.title}</button>)}</div>)}</div>
+            <article className="f1-market-display">
+              <div className="f1-display-head"><span>{currentF1Market.id === "h2h" ? "H2H" : currentF1Market.id === "pole" ? "P1" : "◆"}</span><div><small>{currentF1Market.section}</small><h2>{currentF1Market.title}</h2></div><b>{currentF1Market.options.length} opções</b></div>
+              {renderF1Options(currentF1Market)}
+            </article>
+          </div>
+        </section>}
 
         <aside className="slip">
           <div className="slip-title"><span>★</span><h2>SEU BILHETE</h2><span>★</span></div>
@@ -361,9 +882,10 @@ export default function Home() {
           {passwordError && <span className="password-error">{passwordError}</span>}<button className="primary-button unlock-button" onClick={submitPassword}>ENTRAR</button>
         </section> : <section className="admin-modal" role="dialog" aria-modal="true" aria-labelledby="admin-title">
           <div className="admin-head"><div><p className="eyebrow">ÁREA DE CONTROLE</p><h2 id="admin-title">PAINEL DO ADM</h2></div><button className="modal-close" aria-label="Fechar painel" onClick={() => setAdminOpen(false)}>×</button></div>
-          <div className="admin-tabs"><button className={adminTab === "round" ? "active" : ""} onClick={() => setAdminTab("round")}>JOGOS E ODDS</button><button className={adminTab === "tickets" ? "active" : ""} onClick={() => setAdminTab("tickets")}>CONFERIR TICKETS <span>{savedTickets.length}</span></button></div>
-          {adminTab === "round" ? <><p className="admin-intro">Cadastre os confrontos e defina as odds da rodada.</p><div className="admin-games">{games.map((game, index) => <article className="admin-game" key={game.id}><div className="admin-game-title"><strong>JOGO {String(index + 1).padStart(2, "0")}</strong><button onClick={() => setGames((current) => current.filter((item) => item.id !== game.id))}>REMOVER</button></div><div className="admin-fields teams-fields"><label>Mandante<input value={game.home} onChange={(e) => updateGame(game.id, "home", e.target.value)} /></label><label>Sigla<input maxLength={4} value={game.homeShort} onChange={(e) => updateGame(game.id, "homeShort", e.target.value.toUpperCase())} /></label><label>Visitante<input value={game.away} onChange={(e) => updateGame(game.id, "away", e.target.value)} /></label><label>Sigla<input maxLength={4} value={game.awayShort} onChange={(e) => updateGame(game.id, "awayShort", e.target.value.toUpperCase())} /></label></div><div className="odds-heading">ODDS DE VENCEDOR E AMBAS MARCAM</div><div className="admin-fields base-odds-fields">{[["home", "Mandante"], ["away", "Visitante"], ["bttsYes", "Ambas: sim"], ["bttsNo", "Ambas: não"]].map(([field, label]) => <label key={field}>{label}<input type="number" min="1" step="0.01" value={game.odds[field as "home" | "away" | "bttsYes" | "bttsNo"]} onChange={(e) => updateGame(game.id, `odds.${field}`, e.target.value)} /></label>)}</div><div className="odds-heading">ODDS POR PLACAR EXATO</div><div className="admin-fields odds-fields">{SCORE_OPTIONS.map((scoreOption) => <label key={scoreOption}>{scoreOption.replace("x", " × ")}<input type="number" min="1" step="0.01" value={game.odds.exactScores[scoreOption]} onChange={(e) => setGames((current) => current.map((item) => item.id === game.id ? { ...item, odds: { ...item.odds, exactScores: { ...item.odds.exactScores, [scoreOption]: Number(e.target.value) || 0 } } } : item))} /></label>)}</div></article>)}</div></> : <div className="tickets-panel"><div className="ticket-search"><label htmlFor="ticket-id">VALIDAR ID NUMÉRICO</label><input id="ticket-id" inputMode="numeric" placeholder="16 dígitos" maxLength={16} value={ticketSearch} onChange={(e) => setTicketSearch(e.target.value.replace(/\D/g, ""))} /></div>{ticketSearch && <div className={decodedTicket ? "decoded-ticket valid" : "decoded-ticket invalid"}>{decodedTicket ? <><strong>✓ ID VÁLIDO</strong><div><span>Tipo<b>{decodedTicket.mode}</b></span><span>Odd<b>{fmtOdd(decodedTicket.odd)}</b></span><span>Valor<b>£ {money(decodedTicket.value)}</b></span></div></> : <><strong>✕ ID INVÁLIDO</strong><p>Confira os 16 dígitos. O checksum não corresponde.</p></>}</div>}<div className="ticket-list">{filteredTickets.map((ticket) => <article className="saved-ticket" key={ticket.id}><div className="saved-ticket-head"><strong>#{ticket.id}</strong><span className={ticket.status}>{ticket.status}</span></div><div className="saved-ticket-meta"><span>{ticket.mode === "multiple" ? "Múltipla" : "Separadas"}</span><span>{ticket.selections.length} seleções</span><span>£ {money(ticket.totalStake)}</span><span>{new Date(ticket.createdAt).toLocaleString("pt-BR")}</span></div>{ticket.selections.map((item) => <p key={item.id}>{item.game} — {item.pick} @{fmtOdd(item.odd)}</p>)}<div className="saved-ticket-footer"><strong>Retorno: £ {money(ticket.potentialReturn)}</strong><button onClick={() => updateTicketStatus(ticket.id)}>{ticket.status === "pendente" ? "MARCAR CONFERIDO" : "REABRIR"}</button></div></article>)}</div></div>}
+          <div className="admin-tabs"><button className={adminTab === "round" ? "active" : ""} onClick={() => setAdminTab("round")}>FUTEBOL</button><button className={adminTab === "f1" ? "active" : ""} onClick={() => setAdminTab("f1")}>FÓRMULA 1</button><button className={adminTab === "tickets" ? "active" : ""} onClick={() => setAdminTab("tickets")}>CONFERIR TICKETS <span>{savedTickets.length}</span></button></div>
+          {adminTab === "round" ? <><p className="admin-intro">Cadastre os confrontos e defina as odds da rodada.</p><div className="admin-games">{games.map((game, index) => <article className="admin-game" key={game.id}><div className="admin-game-title"><strong>JOGO {String(index + 1).padStart(2, "0")}</strong><button onClick={() => setGames((current) => current.filter((item) => item.id !== game.id))}>REMOVER</button></div><div className="admin-fields teams-fields"><label>Mandante<input value={game.home} onChange={(e) => updateGame(game.id, "home", e.target.value)} /></label><label>Sigla<input maxLength={4} value={game.homeShort} onChange={(e) => updateGame(game.id, "homeShort", e.target.value.toUpperCase())} /></label><label>Visitante<input value={game.away} onChange={(e) => updateGame(game.id, "away", e.target.value)} /></label><label>Sigla<input maxLength={4} value={game.awayShort} onChange={(e) => updateGame(game.id, "awayShort", e.target.value.toUpperCase())} /></label></div><div className="odds-heading">ODDS DE VENCEDOR E AMBAS MARCAM</div><div className="admin-fields base-odds-fields">{[["home", "Mandante"], ["away", "Visitante"], ["bttsYes", "Ambas: sim"], ["bttsNo", "Ambas: não"]].map(([field, label]) => <label key={field}>{label}<input type="number" min="1" step="0.01" value={game.odds[field as "home" | "away" | "bttsYes" | "bttsNo"]} onChange={(e) => updateGame(game.id, `odds.${field}`, e.target.value)} /></label>)}</div><div className="odds-heading">ODDS POR PLACAR EXATO</div><div className="admin-fields odds-fields">{SCORE_OPTIONS.map((scoreOption) => <label key={scoreOption}>{scoreOption.replace("x", " × ")}<input type="number" min="1" step="0.01" value={game.odds.exactScores[scoreOption]} onChange={(e) => setGames((current) => current.map((item) => item.id === game.id ? { ...item, odds: { ...item.odds, exactScores: { ...item.odds.exactScores, [scoreOption]: Number(e.target.value) || 0 } } } : item))} /></label>)}</div></article>)}</div></> : adminTab === "f1" ? <div className="f1-admin"><p className="admin-intro">Edite o evento, os pilotos, as equipes e as odds. Os pares de head-to-head já estão agrupados.</p><label className="event-field">Nome do evento<input value={f1.eventName} onChange={(e) => setF1((current) => ({ ...current, eventName: e.target.value.toUpperCase() }))} /></label><div className="admin-games">{f1.markets.map((market) => <article className="admin-game" key={market.id}><div className="admin-game-title"><strong>{market.section} · {market.title}</strong></div><div className="f1-admin-options">{market.options.map((option) => <div className="f1-admin-option" key={option.id}><label>Opção<input value={option.label} onChange={(e) => updateF1Option(market.id, option.id, "label", e.target.value)} /></label><label>Odd<input type="number" min="1" step="0.01" value={option.odd} onChange={(e) => updateF1Option(market.id, option.id, "odd", e.target.value)} /></label>{option.group && <small>Grupo: {option.group}</small>}</div>)}</div></article>)}</div></div> : <div className="tickets-panel"><div className="ticket-search"><label htmlFor="ticket-id">VALIDAR ID NUMÉRICO</label><input id="ticket-id" inputMode="numeric" placeholder="16 dígitos" maxLength={16} value={ticketSearch} onChange={(e) => setTicketSearch(e.target.value.replace(/\D/g, ""))} /></div>{ticketSearch && <div className={decodedTicket ? "decoded-ticket valid" : "decoded-ticket invalid"}>{decodedTicket ? <><strong>✓ ID VÁLIDO</strong><div><span>Tipo<b>{decodedTicket.mode}</b></span><span>Odd<b>{fmtOdd(decodedTicket.odd)}</b></span><span>Valor<b>£ {money(decodedTicket.value)}</b></span></div></> : <><strong>✕ ID INVÁLIDO</strong><p>Confira os 16 dígitos. O checksum não corresponde.</p></>}</div>}<div className="ticket-list">{filteredTickets.map((ticket) => <article className="saved-ticket" key={ticket.id}><div className="saved-ticket-head"><strong>#{ticket.id}</strong><span className={ticket.status}>{ticket.status}</span></div><div className="saved-ticket-meta"><span>{ticket.mode === "multiple" ? "Múltipla" : "Separadas"}</span><span>{ticket.selections.length} seleções</span><span>£ {money(ticket.totalStake)}</span><span>{new Date(ticket.createdAt).toLocaleString("pt-BR")}</span></div>{ticket.selections.map((item) => <p key={item.id}>{item.game} — {item.pick} @{fmtOdd(item.odd)}</p>)}<div className="saved-ticket-footer"><strong>Retorno: £ {money(ticket.potentialReturn)}</strong><button onClick={() => updateTicketStatus(ticket.id)}>{ticket.status === "pendente" ? "MARCAR CONFERIDO" : "REABRIR"}</button></div></article>)}</div></div>}
           {adminTab === "round" && <div className="admin-footer"><button className="secondary-button" onClick={addGame}>+ ADICIONAR JOGO</button><div className="admin-save-group">{adminMessage && <span>{adminMessage}</span>}<button className="secondary-button" onClick={copyGamesJson}>COPIAR JSON</button><button className="primary-button" onClick={saveGames}>SALVAR RODADA</button></div></div>}
+          {adminTab === "f1" && <div className="admin-footer"><span>As alterações ficam neste navegador.</span><div className="admin-save-group">{adminMessage && <span>{adminMessage}</span>}<button className="primary-button" onClick={saveF1}>SALVAR FÓRMULA 1</button></div></div>}
         </section>}
       </div>}
     </main>
