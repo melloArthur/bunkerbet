@@ -14,7 +14,7 @@ type Game = {
 type Selection = { id: string; gameId: string; game: string; market: string; pick: string; odd: number; sport?: Sport; marketCode?: string; subject?: string };
 type TicketMode = "multiple" | "singles";
 type Sport = "football" | "f1";
-type F1Option = { id: string; label: string; odd: number; group?: string };
+type F1Option = { id: string; label: string; odd: number; group?: string; subject?: string };
 type F1Market = { id: string; section: string; title: string; options: F1Option[] };
 type F1Config = { eventName: string; markets: F1Market[] };
 type SavedTicket = {
@@ -56,8 +56,8 @@ const DEFAULT_GAMES: Game[] = [
     "id": "steaua-real",
     "home": "Steaua Bucareste",
     "away": "Real Madrid",
-    "homeShort": "STB",
-    "awayShort": "RM",
+    "homeShort": "BUC",
+    "awayShort": "RMA",
     "odds": {
       "home": 1.97,
       "away": 1.85,
@@ -77,8 +77,8 @@ const DEFAULT_GAMES: Game[] = [
     "id": "milan-lazio",
     "home": "AC Milan",
     "away": "SS Lazio",
-    "homeShort": "ACM",
-    "awayShort": "SSL",
+    "homeShort": "MIL",
+    "awayShort": "LAZ",
     "odds": {
       "home": 1.49,
       "away": 2.63,
@@ -98,7 +98,7 @@ const DEFAULT_GAMES: Game[] = [
     "id": "fiorentina-constantino",
     "home": "ACF Fiorentina",
     "away": "Imperial Constantino",
-    "homeShort": "ACF",
+    "homeShort": "FIO",
     "awayShort": "ICS",
     "odds": {
       "home": 1.44,
@@ -121,450 +121,111 @@ const SCORE_OPTIONS = ["3x0", "3x1", "3x2", "0x3", "1x3", "2x3"];
 const ADMIN_PASSWORD = "bunker123";
 const F1_SECTIONS = ["PILOTOS", "EQUIPES", "TEMPORADA"];
 const F1_DRIVERS = [
-  {
-    id: "ireland",
-    name: "I. Ireland (REN)",
-    teamId: "renault",
-    odds: {
-      winner: 5.40,
-      podiumYes: 1.85,
-      podiumNo: 1.64,
-      pole: 9.07,
-    },
-  },
-  {
-    id: "mclaren",
-    name: "B. McLaren (POR)",
-    teamId: "porsche",
-    odds: {
-      winner: 8.96,
-      podiumYes: 2.51,
-      podiumNo: 1.33,
-      pole: 13.64,
-    },
-  },
-  {
-    id: "bonnier",
-    name: "J. Bonnier (LOT)",
-    teamId: "lotus",
-    odds: {
-      winner: 9.29,
-      podiumYes: 2.56,
-      podiumNo: 1.32,
-      pole: 10.34,
-    },
-  },
-  {
-    id: "moss",
-    name: "S. Moss (LOT)",
-    teamId: "lotus",
-    odds: {
-      winner: 9.78,
-      podiumYes: 2.64,
-      podiumNo: 1.30,
-      pole: 9.73,
-    },
-  },
-  {
-    id: "brabham",
-    name: "J. Brabham (COO)",
-    teamId: "cooper",
-    odds: {
-      winner: 10.83,
-      podiumYes: 2.79,
-      podiumNo: 1.26,
-      pole: 6.15,
-    },
-  },
-  {
-    id: "ginther",
-    name: "R. Ginther (FER)",
-    teamId: "ferrari",
-    odds: {
-      winner: 12.10,
-      podiumYes: 2.96,
-      podiumNo: 1.23,
-      pole: 6.24,
-    },
-  },
-  {
-    id: "gendebien",
-    name: "O. Gendebien (REN)",
-    teamId: "renault",
-    odds: {
-      winner: 12.97,
-      podiumYes: 3.07,
-      podiumNo: 1.21,
-      pole: 10.73,
-    },
-  },
-  {
-    id: "clark",
-    name: "J. Clark (POR)",
-    teamId: "porsche",
-    odds: {
-      winner: 13.97,
-      podiumYes: 3.18,
-      podiumNo: 1.20,
-      pole: 16.79,
-    },
-  },
-  {
-    id: "allison",
-    name: "C. Allison (COO)",
-    teamId: "cooper",
-    odds: {
-      winner: 20.65,
-      podiumYes: 3.79,
-      podiumNo: 1.13,
-      pole: 20.87,
-    },
-  },
-  {
-    id: "mairesse",
-    name: "W. Mairesse (FER)",
-    teamId: "ferrari",
-    odds: {
-      winner: 21.41,
-      podiumYes: 3.85,
-      podiumNo: 1.12,
-      pole: 22.19,
-    },
-  },
-  {
-    id: "gonzalez",
-    name: "J. F. González (MAT)",
-    teamId: "matra",
-    odds: {
-      winner: 22.67,
-      podiumYes: 3.92,
-      podiumNo: 1.12,
-      pole: 21.50,
-    },
-  },
-  {
-    id: "phil-hill",
-    name: "P. Hill (LAM)",
-    teamId: "lamborghini",
-    odds: {
-      winner: 25.21,
-      podiumYes: 4.07,
-      podiumNo: 1.11,
-      pole: 27.30,
-    },
-  },
-  {
-    id: "surtees",
-    name: "J. Surtees (LAM)",
-    teamId: "lamborghini",
-    odds: {
-      winner: 26.56,
-      podiumYes: 4.14,
-      podiumNo: 1.10,
-      pole: 30.80,
-    },
-  },
-  {
-    id: "von-trips",
-    name: "W. von Trips (ALF)",
-    teamId: "alfa-romeo",
-    odds: {
-      winner: 26.96,
-      podiumYes: 4.15,
-      podiumNo: 1.10,
-      pole: 29.88,
-    },
-  },
-  {
-    id: "trintignant",
-    name: "M. Trintignant (MAT)",
-    teamId: "matra",
-    odds: {
-      winner: 29.76,
-      podiumYes: 4.30,
-      podiumNo: 1.09,
-      pole: 40.42,
-    },
-  },
-  {
-    id: "graham-hill",
-    name: "G. Hill (ALF)",
-    teamId: "alfa-romeo",
-    odds: {
-      winner: 30.96,
-      podiumYes: 4.33,
-      podiumNo: 1.09,
-      pole: 40.70,
-    },
-  },
+  { id: "ireland", name: "I. Ireland (REN)", teamId: "renault", odds: { winner: 5.40, podiumYes: 1.85, podiumNo: 1.64, pole: 9.07 } },
+  { id: "mclaren", name: "B. McLaren (POR)", teamId: "porsche", odds: { winner: 8.96, podiumYes: 2.51, podiumNo: 1.33, pole: 13.64 } },
+  { id: "bonnier", name: "J. Bonnier (LOT)", teamId: "lotus", odds: { winner: 9.29, podiumYes: 2.56, podiumNo: 1.32, pole: 10.34 } },
+  { id: "moss", name: "S. Moss (LOT)", teamId: "lotus", odds: { winner: 9.78, podiumYes: 2.64, podiumNo: 1.30, pole: 9.73 } },
+  { id: "brabham", name: "J. Brabham (COO)", teamId: "cooper", odds: { winner: 10.83, podiumYes: 2.79, podiumNo: 1.26, pole: 6.15 } },
+  { id: "ginther", name: "R. Ginther (FER)", teamId: "ferrari", odds: { winner: 12.10, podiumYes: 2.96, podiumNo: 1.23, pole: 6.24 } },
+  { id: "gendebien", name: "O. Gendebien (REN)", teamId: "renault", odds: { winner: 12.97, podiumYes: 3.07, podiumNo: 1.21, pole: 10.73 } },
+  { id: "clark", name: "J. Clark (POR)", teamId: "porsche", odds: { winner: 13.97, podiumYes: 3.18, podiumNo: 1.20, pole: 16.79 } },
+  { id: "allison", name: "C. Allison (COO)", teamId: "cooper", odds: { winner: 20.65, podiumYes: 3.79, podiumNo: 1.13, pole: 20.87 } },
+  { id: "mairesse", name: "W. Mairesse (FER)", teamId: "ferrari", odds: { winner: 21.41, podiumYes: 3.85, podiumNo: 1.12, pole: 22.19 } },
+  { id: "gonzalez", name: "J. F. González (MAT)", teamId: "matra", odds: { winner: 22.67, podiumYes: 3.92, podiumNo: 1.12, pole: 21.50 } },
+  { id: "phil-hill", name: "P. Hill (LAM)", teamId: "lamborghini", odds: { winner: 25.21, podiumYes: 4.07, podiumNo: 1.11, pole: 27.30 } },
+  { id: "surtees", name: "J. Surtees (LAM)", teamId: "lamborghini", odds: { winner: 26.56, podiumYes: 4.14, podiumNo: 1.10, pole: 30.80 } },
+  { id: "von-trips", name: "W. von Trips (ALF)", teamId: "alfa-romeo", odds: { winner: 26.96, podiumYes: 4.15, podiumNo: 1.10, pole: 29.88 } },
+  { id: "trintignant", name: "M. Trintignant (MAT)", teamId: "matra", odds: { winner: 29.76, podiumYes: 4.30, podiumNo: 1.09, pole: 40.42 } },
+  { id: "graham-hill", name: "G. Hill (ALF)", teamId: "alfa-romeo", odds: { winner: 30.96, podiumYes: 4.33, podiumNo: 1.09, pole: 40.70 } },
 ];
-
 const F1_TEAMS = [
-  {
-    id: "renault",
-    name: "Renault (GEN+IRE)",
-    odds: {
-      mostPoints: 3.75,
-      bothScoreYes: 2.44,
-      bothScoreNo: 1.35,
-    },
-  },
-  {
-    id: "porsche",
-    name: "Porsche (CLA+MCL)",
-    odds: {
-      mostPoints: 5.44,
-      bothScoreYes: 3.09,
-      bothScoreNo: 1.21,
-    },
-  },
-  {
-    id: "lotus",
-    name: "Lotus (BON+MOS)",
-    odds: {
-      mostPoints: 4.68,
-      bothScoreYes: 2.64,
-      bothScoreNo: 1.30,
-    },
-  },
-  {
-    id: "cooper",
-    name: "Cooper (BRA+ALL)",
-    odds: {
-      mostPoints: 7.20,
-      bothScoreYes: 3.89,
-      bothScoreNo: 1.12,
-    },
-  },
-  {
-    id: "ferrari",
-    name: "Ferrari (GIN+MAI)",
-    odds: {
-      mostPoints: 7.85,
-      bothScoreYes: 4.06,
-      bothScoreNo: 1.11,
-    },
-  },
-  {
-    id: "lamborghini",
-    name: "Lamborghini (HIL+SUR)",
-    odds: {
-      mostPoints: 13.22,
-      bothScoreYes: 4.99,
-      bothScoreNo: 1.05,
-    },
-  },
-  {
-    id: "matra",
-    name: "Matra (GON+TRI)",
-    odds: {
-      mostPoints: 13.13,
-      bothScoreYes: 4.99,
-      bothScoreNo: 1.05,
-    },
-  },
-  {
-    id: "alfa-romeo",
-    name: "Alfa Romeo (VTR+GHI)",
-    odds: {
-      mostPoints: 14.72,
-      bothScoreYes: 5.12,
-      bothScoreNo: 1.05,
-    },
-  },
+  { id: "renault", name: "Renault (GEN+IRE)", odds: { mostPoints: 3.75, bothScoreYes: 2.44, bothScoreNo: 1.35 } },
+  { id: "porsche", name: "Porsche (CLA+MCL)", odds: { mostPoints: 5.44, bothScoreYes: 3.09, bothScoreNo: 1.21 } },
+  { id: "lotus", name: "Lotus (BON+MOS)", odds: { mostPoints: 4.68, bothScoreYes: 2.64, bothScoreNo: 1.30 } },
+  { id: "cooper", name: "Cooper (BRA+ALL)", odds: { mostPoints: 7.20, bothScoreYes: 3.89, bothScoreNo: 1.12 } },
+  { id: "ferrari", name: "Ferrari (GIN+MAI)", odds: { mostPoints: 7.85, bothScoreYes: 4.06, bothScoreNo: 1.11 } },
+  { id: "lamborghini", name: "Lamborghini (HIL+SUR)", odds: { mostPoints: 13.22, bothScoreYes: 4.99, bothScoreNo: 1.05 } },
+  { id: "matra", name: "Matra (GON+TRI)", odds: { mostPoints: 13.13, bothScoreYes: 4.99, bothScoreNo: 1.05 } },
+  { id: "alfa-romeo", name: "Alfa Romeo (VTR+GHI)", odds: { mostPoints: 14.72, bothScoreYes: 5.12, bothScoreNo: 1.05 } },
 ];
-
 const F1_HEAD_TO_HEAD = [
-  {
-    id: "brabham-allison",
-    driver1: "brabham",
-    driver1Odd: 1.39,
-    driver2: "allison",
-    driver2Odd: 2.32,
-  },
-  {
-    id: "moss-bonnier",
-    driver1: "moss",
-    driver1Odd: 1.78,
-    driver2: "bonnier",
-    driver2Odd: 1.70,
-  },
-  {
-    id: "ginther-mairesse",
-    driver1: "ginther",
-    driver1Odd: 1.42,
-    driver2: "mairesse",
-    driver2Odd: 2.23,
-  },
-  {
-    id: "gonzalez-trintignant",
-    driver1: "gonzalez",
-    driver1Odd: 1.56,
-    driver2: "trintignant",
-    driver2Odd: 1.96,
-  },
-  {
-    id: "gendebien-ireland",
-    driver1: "gendebien",
-    driver1Odd: 2.57,
-    driver2: "ireland",
-    driver2Odd: 1.31,
-  },
-  {
-    id: "surtees-phil-hill",
-    driver1: "surtees",
-    driver1Odd: 1.78,
-    driver2: "phil-hill",
-    driver2Odd: 1.70,
-  },
-  {
-    id: "clark-mclaren",
-    driver1: "clark",
-    driver1Odd: 2.11,
-    driver2: "mclaren",
-    driver2Odd: 1.48,
-  },
-  {
-    id: "von-trips-graham-hill",
-    driver1: "von-trips",
-    driver1Odd: 1.65,
-    driver2: "graham-hill",
-    driver2Odd: 1.84,
-  },
+  { id: "brabham-allison", driver1: "brabham", driver1Odd: 1.39, driver2: "allison", driver2Odd: 2.32 },
+  { id: "moss-bonnier", driver1: "moss", driver1Odd: 1.78, driver2: "bonnier", driver2Odd: 1.70 },
+  { id: "ginther-mairesse", driver1: "ginther", driver1Odd: 1.42, driver2: "mairesse", driver2Odd: 2.23 },
+  { id: "gonzalez-trintignant", driver1: "gonzalez", driver1Odd: 1.56, driver2: "trintignant", driver2Odd: 1.96 },
+  { id: "gendebien-ireland", driver1: "gendebien", driver1Odd: 2.57, driver2: "ireland", driver2Odd: 1.31 },
+  { id: "surtees-phil-hill", driver1: "surtees", driver1Odd: 1.78, driver2: "phil-hill", driver2Odd: 1.70 },
+  { id: "clark-mclaren", driver1: "clark", driver1Odd: 2.11, driver2: "mclaren", driver2Odd: 1.48 },
+  { id: "von-trips-graham-hill", driver1: "von-trips", driver1Odd: 1.65, driver2: "graham-hill", driver2Odd: 1.84 },
 ];
-
+const F1_TEAM_CHAMPION_ODDS: Record<string, number> = {
+  renault: 1.64,
+  lotus: 3.47,
+  porsche: 5.09,
+  cooper: 31.67,
+  ferrari: 52.21,
+  lamborghini: 500,
+  matra: 500,
+  "alfa-romeo": 500,
+};
+const F1_DRIVER_CHAMPION_ODDS: Record<string, number> = {
+  ireland: 1.39,
+  mclaren: 6.94,
+  bonnier: 10.21,
+  moss: 13.78,
+  brabham: 25.74,
+  ginther: 44.30,
+  clark: 50.43,
+  gendebien: 56.33,
+  allison: 292.14,
+  mairesse: 342.89,
+  gonzalez: 413.69,
+  "phil-hill": 500,
+  surtees: 500,
+  "von-trips": 500,
+  trintignant: 500,
+  "graham-hill": 500,
+};
 const getF1Driver = (id: string) => {
   const driver = F1_DRIVERS.find((item) => item.id === id);
-
-  if (!driver) {
-    throw new Error(`Piloto de F1 não encontrado: ${id}`);
-  }
-
+  if (!driver) throw new Error(`Piloto de F1 não encontrado: ${id}`);
   return driver;
 };
-
 const DEFAULT_F1: F1Config = {
   eventName: "PRÓXIMO GRANDE PRÊMIO",
-
   markets: [
-    {
-      id: "race-winner",
-      section: "PILOTOS",
-      title: "Vencedor",
-      options: F1_DRIVERS.map((driver) => ({
-        id: driver.id,
-        label: driver.name,
-        odd: driver.odds.winner,
-      })),
-    },
-
-    {
-      id: "podium",
-      section: "PILOTOS",
-      title: "Pódio: sim/não",
-      options: F1_DRIVERS.flatMap((driver) => [
-        {
-          id: `${driver.id}-yes`,
-          group: driver.id,
-          label: `${driver.name} — Sim`,
-          odd: driver.odds.podiumYes,
-        },
-        {
-          id: `${driver.id}-no`,
-          group: driver.id,
-          label: `${driver.name} — Não`,
-          odd: driver.odds.podiumNo,
-        },
-      ]),
-    },
-
-    {
-      id: "h2h",
-      section: "PILOTOS",
-      title: "Head-to-head",
-      options: F1_HEAD_TO_HEAD.flatMap((duel) => {
-        const driver1 = getF1Driver(duel.driver1);
-        const driver2 = getF1Driver(duel.driver2);
-
-        return [
-          {
-            id: `${duel.id}-${driver1.id}`,
-            group: duel.id,
-            label: driver1.name,
-            odd: duel.driver1Odd,
-          },
-          {
-            id: `${duel.id}-${driver2.id}`,
-            group: duel.id,
-            label: driver2.name,
-            odd: duel.driver2Odd,
-          },
-        ];
-      }),
-    },
-
-    {
-      id: "pole",
-      section: "PILOTOS",
-      title: "Pole position",
-      options: F1_DRIVERS.map((driver) => ({
-        id: driver.id,
-        label: driver.name,
-        odd: driver.odds.pole,
-      })),
-    },
-
-    {
-      id: "team-points",
-      section: "EQUIPES",
-      title: "Equipe marca mais pontos",
-      options: F1_TEAMS.map((team) => ({
-        id: team.id,
-        label: team.name,
-        odd: team.odds.mostPoints,
-      })),
-    },
-
-    {
-      id: "both-score",
-      section: "EQUIPES",
-      title: "Ambos pontuam: sim/não",
-      options: F1_TEAMS.flatMap((team) => [
-        {
-          id: `${team.id}-yes`,
-          group: team.id,
-          label: `${team.name} — Sim`,
-          odd: team.odds.bothScoreYes,
-        },
-        {
-          id: `${team.id}-no`,
-          group: team.id,
-          label: `${team.name} — Não`,
-          odd: team.odds.bothScoreNo,
-        },
-      ]),
-    },
-
-    /*
-     * Estes mercados dependem do número de GPs restantes.
-     * Reative-os depois que as odds de temporada forem calculadas.
-     *
-     * {
-     *   id: "driver-champion",
-     *   section: "TEMPORADA",
-     *   title: "Piloto campeão",
-     *   options: [],
-     * },
-     *
-     * {
-     *   id: "team-champion",
-     *   section: "TEMPORADA",
-     *   title: "Equipe campeã",
-     *   options: [],
-     * },
-     */
+    { id: "race-winner", section: "PILOTOS", title: "Vencedor", options: F1_DRIVERS.map((driver) => ({ id: driver.id, label: driver.name, odd: driver.odds.winner })) },
+    { id: "podium", section: "PILOTOS", title: "Pódio: sim/não", options: F1_DRIVERS.flatMap((driver) => [
+      { id: `${driver.id}-yes`, group: driver.id, subject: driver.id, label: `${driver.name} — Sim`, odd: driver.odds.podiumYes },
+      { id: `${driver.id}-no`, group: driver.id, subject: driver.id, label: `${driver.name} — Não`, odd: driver.odds.podiumNo },
+    ]) },
+    { id: "h2h", section: "PILOTOS", title: "Head-to-head", options: F1_HEAD_TO_HEAD.flatMap((duel) => {
+      const driver1 = getF1Driver(duel.driver1);
+      const driver2 = getF1Driver(duel.driver2);
+      return [
+        { id: `${duel.id}-${driver1.id}`, group: duel.id, subject: driver1.id, label: driver1.name, odd: duel.driver1Odd },
+        { id: `${duel.id}-${driver2.id}`, group: duel.id, subject: driver2.id, label: driver2.name, odd: duel.driver2Odd },
+      ];
+    }) },
+    { id: "pole", section: "PILOTOS", title: "Pole position", options: F1_DRIVERS.map((driver) => ({ id: driver.id, label: driver.name, odd: driver.odds.pole })) },
+    { id: "team-points", section: "EQUIPES", title: "Equipe marca mais pontos", options: F1_TEAMS.map((team) => ({ id: team.id, label: team.name, odd: team.odds.mostPoints })) },
+    { id: "both-score", section: "EQUIPES", title: "Ambos pontuam: sim/não", options: F1_TEAMS.flatMap((team) => [
+      { id: `${team.id}-yes`, group: team.id, label: `${team.name} — Sim`, odd: team.odds.bothScoreYes },
+      { id: `${team.id}-no`, group: team.id, label: `${team.name} — Não`, odd: team.odds.bothScoreNo },
+    ]) },
+    { id: "driver-champion", section: "TEMPORADA", title: "Piloto campeão", options: F1_DRIVERS.map((driver) => ({
+      id: driver.id,
+      label: driver.name,
+      odd: F1_DRIVER_CHAMPION_ODDS[driver.id],
+    })) },
+    { id: "team-champion", section: "TEMPORADA", title: "Equipe campeã", options: F1_TEAMS.map((team) => ({
+      id: team.id,
+      label: team.name,
+      odd: F1_TEAM_CHAMPION_ODDS[team.id],
+    })) },
   ],
 };
+
 const fmtOdd = (value: number) => value.toFixed(2);
 const money = (value: number) => new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 const toNumber = (value: string | undefined) => Number((value ?? "").replace(",", ".")) || 0;
@@ -592,7 +253,7 @@ export default function Home() {
 
   useEffect(() => {
     const savedGames = window.localStorage.getItem("bunker-bet-games");
-    const savedF1 = window.localStorage.getItem("bunker-bet-f1-v3");
+    const savedF1 = window.localStorage.getItem("bunker-bet-f1-v5");
     const savedHistory = window.localStorage.getItem("bunker-bet-tickets");
     // Dados locais só podem ser restaurados após a montagem no navegador.
     if (savedGames) try {
@@ -673,7 +334,7 @@ export default function Home() {
       odd: option.odd,
       sport: "f1",
       marketCode: market.id,
-      subject: market.id === "podium" ? option.group : option.id,
+      subject: option.subject ?? (market.id === "podium" ? option.group : option.id),
     });
   }
 
@@ -759,7 +420,7 @@ export default function Home() {
   }
 
   function saveF1() {
-    window.localStorage.setItem("bunker-bet-f1-v3", JSON.stringify(f1));
+    window.localStorage.setItem("bunker-bet-f1-v5", JSON.stringify(f1));
     setAdminMessage("Mercados da Fórmula 1 salvos neste navegador.");
     window.setTimeout(() => setAdminMessage(""), 2600);
   }
