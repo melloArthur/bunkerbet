@@ -192,7 +192,7 @@ const getF1Driver = (id: string) => {
   return driver;
 };
 const DEFAULT_F1: F1Config = {
-  eventName: "PRÓXIMO GRANDE PRÊMIO",
+  eventName: "GP DE MÔNACO",
   markets: [
     { id: "race-winner", section: "PILOTOS", title: "Vencedor", options: F1_DRIVERS.map((driver) => ({ id: driver.id, label: driver.name, odd: driver.odds.winner })) },
     { id: "podium", section: "PILOTOS", title: "Pódio: sim/não", options: F1_DRIVERS.flatMap((driver) => [
@@ -478,7 +478,7 @@ export default function Home() {
     <main>
       <header className="topbar">
         <div className="brand-wrap"><div className="crest" aria-hidden="true"><span>BB</span><small>RP</small></div><div className="brand">BUNKER BET</div><div className="official">CASA DE APOSTAS OFICIAL</div></div>
-        <div className="header-actions"><button className="admin-link" onClick={openAdmin}>PAINEL DO ADM</button><div className="round-status"><i /> {activeSport === "football" ? "RODADA 12 ABERTA" : "GP ABERTO"}</div></div>
+        <div className="header-actions"><button className="admin-link" onClick={openAdmin}>PAINEL DO ADM</button><div className="round-status"><i /> {activeSport === "football" ? "QUARTAS DE FINAL ABERTAS" : "GP ABERTO"}</div></div>
       </header>
 
       <nav className="sport-tabs" aria-label="Modalidade">
@@ -505,7 +505,7 @@ export default function Home() {
             })}
           </div>
         </section> : <section className="content f1-content">
-          <div className="hero f1-hero"><div><p className="eyebrow">BUNKER MOTORSPORT</p><h1>ACELERE SEUS<br />PALPITES.</h1><p className="hero-copy">Escolha pilotos, equipes e mercados da temporada para montar seu ticket.</p></div><div className="f1-flag" aria-hidden="true"><span>01</span><b>RACE</b></div></div>
+          <div className="hero f1-hero"><div><p className="eyebrow">FÓRMULA 1</p><h1>ACELERE SEUS<br />PALPITES.</h1><p className="hero-copy">Escolha pilotos, equipes e mercados da temporada para montar seu ticket.</p></div><div className="f1-flag" aria-hidden="true"><span>01</span><b>RACE</b></div></div>
           <div className="f1-event"><span>PRÓXIMO EVENTO</span><strong>{f1.eventName}</strong></div>
           <div className="f1-browser">
             <div className="f1-market-nav">{F1_SECTIONS.map((section) => <div className="f1-nav-group" key={section}><strong>{section}</strong>{f1.markets.filter((market) => market.section === section).map((market) => <button key={market.id} className={activeF1Market === market.id ? "active" : ""} onClick={() => setActiveF1Market(market.id)}>{market.title}</button>)}</div>)}</div>
