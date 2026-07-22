@@ -31,90 +31,8 @@ type SavedTicket = {
 };
 
 const DEFAULT_GAMES: Game[] = [
-  {
-    "id": "sarajevo-girondino",
-    "home": "FK Sarajevo",
-    "away": "CA Girondino",
-    "homeShort": "SRJ",
-    "awayShort": "CAG",
-    "odds": {
-      "home": 1.51,
-      "away": 2.57,
-      "bttsYes": 1.3,
-      "bttsNo": 3.6,
-      "exactScores": {
-        "3x0": 5.14,
-        "3x1": 3.99,
-        "3x2": 4.64,
-        "0x3": 11.97,
-        "1x3": 7.0,
-        "2x3": 6.14
-      }
-    }
-  },
-  {
-    "id": "steaua-real",
-    "home": "Steaua Bucareste",
-    "away": "Real Madrid",
-    "homeShort": "BUC",
-    "awayShort": "RMA",
-    "odds": {
-      "home": 1.97,
-      "away": 1.85,
-      "bttsYes": 1.27,
-      "bttsNo": 3.81,
-      "exactScores": {
-        "3x0": 8.02,
-        "3x1": 5.26,
-        "3x2": 5.17,
-        "0x3": 7.25,
-        "1x3": 4.91,
-        "2x3": 5.0
-      }
-    }
-  },
-  {
-    "id": "milan-lazio",
-    "home": "AC Milan",
-    "away": "SS Lazio",
-    "homeShort": "MIL",
-    "awayShort": "LAZ",
-    "odds": {
-      "home": 1.49,
-      "away": 2.63,
-      "bttsYes": 1.3,
-      "bttsNo": 3.57,
-      "exactScores": {
-        "3x0": 5.03,
-        "3x1": 3.94,
-        "3x2": 4.62,
-        "0x3": 12.35,
-        "1x3": 7.17,
-        "2x3": 6.24
-      }
-    }
-  },
-  {
-    "id": "fiorentina-constantino",
-    "home": "ACF Fiorentina",
-    "away": "Imperial Constantino",
-    "homeShort": "FIO",
-    "awayShort": "ICS",
-    "odds": {
-      "home": 1.44,
-      "away": 2.8,
-      "bttsYes": 1.31,
-      "bttsNo": 3.49,
-      "exactScores": {
-        "3x0": 4.71,
-        "3x1": 3.8,
-        "3x2": 4.6,
-        "0x3": 13.51,
-        "1x3": 7.67,
-        "2x3": 6.54
-      }
-    }
-  }
+  { id: "real-constantino", home: "Real Madrid", away: "Imperial Constantino", homeShort: "RM", awayShort: "IC", odds: { home: 1.72, away: 4.2, bttsYes: 1.84, bttsNo: 1.95, exactScores: { "3x0": 6.5, "3x1": 5.2, "3x2": 7.4, "0x3": 12, "1x3": 9.5, "2x3": 11 } } },
+  { id: "girondino-azul", home: "C.A. Girondino", away: "Monte Azul", homeShort: "CAG", awayShort: "MA", odds: { home: 2.1, away: 2.95, bttsYes: 1.76, bttsNo: 2.05, exactScores: { "3x0": 7.2, "3x1": 5.8, "3x2": 6.8, "0x3": 8.5, "1x3": 6.6, "2x3": 7.5 } } },
 ];
 
 const SCORE_OPTIONS = ["3x0", "3x1", "3x2", "0x3", "1x3", "2x3"];
@@ -164,9 +82,9 @@ const F1_TEAM_CHAMPION_ODDS: Record<string, number> = {
   porsche: 5.09,
   cooper: 31.67,
   ferrari: 52.21,
-  lamborghini: 500,
-  matra: 500,
-  "alfa-romeo": 500,
+  lamborghini: 553.21,
+  matra: 575.60,
+  "alfa-romeo": 941.22,
 };
 const F1_DRIVER_CHAMPION_ODDS: Record<string, number> = {
   ireland: 1.39,
@@ -180,11 +98,11 @@ const F1_DRIVER_CHAMPION_ODDS: Record<string, number> = {
   allison: 292.14,
   mairesse: 342.89,
   gonzalez: 413.69,
-  "phil-hill": 500,
-  surtees: 500,
-  "von-trips": 500,
-  trintignant: 500,
-  "graham-hill": 500,
+  "phil-hill": 651.97,
+  surtees: 756.04,
+  "von-trips": 786.59,
+  trintignant: 1133.91,
+  "graham-hill": 1319.62,
 };
 const getF1Driver = (id: string) => {
   const driver = F1_DRIVERS.find((item) => item.id === id);
@@ -192,7 +110,7 @@ const getF1Driver = (id: string) => {
   return driver;
 };
 const DEFAULT_F1: F1Config = {
-  eventName: "GP DE MÔNACO",
+  eventName: "PRÓXIMO GRANDE PRÊMIO",
   markets: [
     { id: "race-winner", section: "PILOTOS", title: "Vencedor", options: F1_DRIVERS.map((driver) => ({ id: driver.id, label: driver.name, odd: driver.odds.winner })) },
     { id: "podium", section: "PILOTOS", title: "Pódio: sim/não", options: F1_DRIVERS.flatMap((driver) => [
@@ -478,7 +396,7 @@ export default function Home() {
     <main>
       <header className="topbar">
         <div className="brand-wrap"><div className="crest" aria-hidden="true"><span>BB</span><small>RP</small></div><div className="brand">BUNKER BET</div><div className="official">CASA DE APOSTAS OFICIAL</div></div>
-        <div className="header-actions"><button className="admin-link" onClick={openAdmin}>PAINEL DO ADM</button><div className="round-status"><i /> {activeSport === "football" ? "QUARTAS DE FINAL ABERTAS" : "GP ABERTO"}</div></div>
+        <div className="header-actions"><button className="admin-link" onClick={openAdmin}>PAINEL DO ADM</button><div className="round-status"><i /> {activeSport === "football" ? "RODADA 12 ABERTA" : "GP ABERTO"}</div></div>
       </header>
 
       <nav className="sport-tabs" aria-label="Modalidade">
@@ -505,7 +423,7 @@ export default function Home() {
             })}
           </div>
         </section> : <section className="content f1-content">
-          <div className="hero f1-hero"><div><p className="eyebrow">FÓRMULA 1</p><h1>ACELERE SEUS<br />PALPITES.</h1><p className="hero-copy">Escolha pilotos, equipes e mercados da temporada para montar seu ticket.</p></div><div className="f1-flag" aria-hidden="true"><span>01</span><b>RACE</b></div></div>
+          <div className="hero f1-hero"><div><p className="eyebrow">BUNKER MOTORSPORT</p><h1>ACELERE SEUS<br />PALPITES.</h1><p className="hero-copy">Escolha pilotos, equipes e mercados da temporada para montar seu ticket.</p></div><div className="f1-flag" aria-hidden="true"><span>01</span><b>RACE</b></div></div>
           <div className="f1-event"><span>PRÓXIMO EVENTO</span><strong>{f1.eventName}</strong></div>
           <div className="f1-browser">
             <div className="f1-market-nav">{F1_SECTIONS.map((section) => <div className="f1-nav-group" key={section}><strong>{section}</strong>{f1.markets.filter((market) => market.section === section).map((market) => <button key={market.id} className={activeF1Market === market.id ? "active" : ""} onClick={() => setActiveF1Market(market.id)}>{market.title}</button>)}</div>)}</div>
